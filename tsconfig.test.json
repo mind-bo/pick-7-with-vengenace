@@ -1,8 +1,18 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "lib": ["ES2022"],
-    "types": ["node"]
+    "lib": [
+      "ES2022"
+    ],
+    "types": [
+      "node",
+      "@cloudflare/workers-types",
+      "@cloudflare/vitest-plugin/types"
+    ]
   },
-  "include": ["test", "src/shared", "src/worker/room.ts"]
+  "include": [
+    "test",
+    "src/shared",
+    "src/worker"
+  ]
 }

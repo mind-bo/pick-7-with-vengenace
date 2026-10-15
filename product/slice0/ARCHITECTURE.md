@@ -235,7 +235,7 @@ export class RoomDO extends DurableObject {
   // Sockets use the WebSocket Hibernation API. Each socket's attachment = { playerId } after auth.
   // Memory holds nothing between messages: every message loads "room", reduces, writes, broadcasts.
 
-  async create(hostName: string): Promise<{ token: string } | { error: "CODE_TAKEN" }>  // RPC from the Worker
+  async create(code: string, hostName: string): Promise<{ token: string } | { error: "CODE_TAKEN" | "BAD_NAME" }>  // RPC from the Worker. Changed in Phase 5: see the note below
   async fetch(req: Request): Promise<Response>                  // WebSocket upgrade only
   async webSocketMessage(ws: WebSocket, data: string): Promise<void> {
     // 1. parse JSON → Command | { t:"resume", token } ; reject malformed
@@ -252,6 +252,10 @@ export class RoomDO extends DurableObject {
 ```
 
 `online` is computed from `ctx.getWebSockets()` and their attachments. It is never stored.
+
+Phase 5 changed `create` to take the room code as its first argument. Reason: a Durable Object cannot read the code that made its id (`idFromName` is a hash), and `Room` stores the code. The Worker router already holds the code, so it passes the code in. `create` also returns `BAD_NAME` when the host name fails the name rules.
+
+Phase 5 also fixed the wire messages that the sketch left open. A phone sends `{t:"resume", token}` or `{t:"join", name}` first. Any other first message gets `NOT_IN_ROOM`. A message that is not valid JSON, or has the wrong shape, gets `MALFORMED`. A removed player gets `REMOVED` and the Durable Object closes that socket with code 4001. A WebSocket upgrade for a code with no room gets HTTP 404 with the text `Room not found`.
 
 ### 4.3 Worker router
 
@@ -336,7 +340,7 @@ Build order matches test order: `score.ts` first, then `outcome.ts`, then `room.
 
 1. **Free-plan numbers.** Resolved on 2026-10-15. The pasted Cloudflare free-plan text gives 13,000 GB-s per day, not 313,000. Question: does a normal game stay inside that number? Answer: yes. Rule used (from Cloudflare's billing description, as I understand it): duration bills at 128 MB, so one room active for one hour costs about 450 GB-s. The daily allowance covers about 28 room-hours. Hibernation lowers the cost. Run AC-N07 before launch to confirm the page has not changed.
 2. **Wrangler on Windows.** Does the local dev server (`wrangler dev`) handle Durable Object WebSockets on this machine? Answer: yes. Result on 2026-10-15, Wrangler 4.151.0, Windows 11. A test Durable Object accepted two WebSockets with the Hibernation API, replied to each message, and showed one open socket after the other socket closed. Static assets from `dist` also loaded.
-3. **Hibernation and `online`.** Does `getWebSockets()` list a socket during `webSocketClose`? If it does, the Offline broadcast needs to exclude the closing socket. Verify in the first integration test.
+3. **Hibernation and `online`.** Does `getWebSockets()` list a socket during `webSocketClose`? Answer: yes. Result on 2026-10-15, Wrangler 4.151.0: inside `webSocketClose`, the closing socket is in the list with `readyState` 2 (CLOSING). The Offline broadcast must leave it out. `room-do.ts` filters it out of the list. It also calls `ws.close()` before the broadcast, and after that call the socket is no longer in the list.
 4. **Playtest bars.** Are the proposed bars in `PRD_SLICE0.md` Section 8 the ones you want? Change them before the playtest.
 5. **Product name.** The folder says "pick-7-with-vengenance". Any public name must avoid implying official status (NF4).
 

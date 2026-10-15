@@ -357,7 +357,11 @@ Wrangler configuration sketch. Check keys against the current Wrangler documenta
 }
 ```
 
-Free-plan numbers used in this design (from text pasted by the owner on 2026-10-15, taken from Cloudflare's documentation): 100,000 requests per day, 13,000 GB-s duration per day, 50 million SQL rows read per day, 100,000 SQL rows written per day, 5 GB stored data, 100 Durable Object classes, SQLite backend only. Incoming WebSocket messages bill at 20 to 1 (from search-result summaries of the pricing page). The pricing page itself was not opened. Open question 1 covers the check.
+Free-plan numbers used in this design: 100,000 requests per day, 13,000 GB-s duration per day, 5 million SQL rows read per day, 100,000 SQL rows written per day, 5 GB stored data, 100 Durable Object classes, SQLite backend only. Incoming WebSocket messages bill at 20 to 1.
+
+AC-N07 check, 2026-10-15: the live Cloudflare pages "Durable Objects: Pricing" (last changed 2026-09-30) and "Durable Objects: Limits" list these numbers. One number in the first version of this document was wrong. The first version said 50 million rows read per day, and the live page says 5 million. This document now holds the live number.
+
+The change does not threaten the design. Each message reads 2 rows (`room` and `tokens`) and each accepted command writes 2 rows. A 6-player, 8-round game needs about 200 row reads and 110 row writes. The write limit is the tighter one, at about 900 games per day.
 
 Estimate (not measured): a 6-player, 8-round game sends about 110 incoming messages. That is about 6 billed requests.
 

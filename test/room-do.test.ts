@@ -128,6 +128,13 @@ describe("joining", () => {
     expect(await res.text()).toBe("Room not found");
   });
 
+  it("a plain GET tells a missing room (404) from an existing room (426)", async () => {
+    const { code } = await hostOf();
+    const missing = await app("/api/rooms/ZZZZ/ws");
+    expect([missing.status, await missing.text()]).toEqual([404, "Room not found"]);
+    expect((await app(`/api/rooms/${code}/ws`)).status).toBe(426);
+  });
+
   it("AC-P07: a bad token gets an error and no room data", async () => {
     const { code } = await hostOf();
     const phone = await Phone.connect(code);

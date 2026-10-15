@@ -49,8 +49,9 @@ export class RoomDO extends DurableObject {
   }
 
   async fetch(req: Request): Promise<Response> {
-    if (req.headers.get("Upgrade") !== "websocket") return new Response("Expected a WebSocket", { status: 426 });
+    // Room check first: a browser cannot read the status of a failed upgrade, so the client sends a plain GET to learn it.
     if (!(await this.ctx.storage.get("room"))) return new Response("Room not found", { status: 404 });
+    if (req.headers.get("Upgrade") !== "websocket") return new Response("Expected a WebSocket", { status: 426 });
     const pair = new WebSocketPair();
     this.ctx.acceptWebSocket(pair[1]);
     return new Response(null, { status: 101, webSocket: pair[0] });

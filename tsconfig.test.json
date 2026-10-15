@@ -14,5 +14,8 @@
     "test",
     "src/shared",
     "src/worker"
+  ],
+  "exclude": [
+    "test/web"
   ]
 }

@@ -8,7 +8,7 @@ Pick 7 scorekeeper is a free web page that keeps score for the card game *Flip 7
 
 ## What it does
 
-In the real game, players add up their own scores on paper, and everyone can see the totals. Pick 7 hides them.
+In the real game, players add up their own scores on paper, and everyone can see the totals. This scorer helps to keep track of scores indiviudally - aids with calculation and calls out the winner as fair as possible.
 
 - A host creates a room and gets a 4-letter code and a join link.
 - Three to twelve players join with the code or the link.

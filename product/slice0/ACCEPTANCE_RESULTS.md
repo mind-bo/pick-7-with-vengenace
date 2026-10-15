@@ -8,6 +8,7 @@ Companion documents: `ACCEPTANCE_CRITERIA.md` (the criteria), `IMPLEMENTATION_PL
 - **Players.** The names were `WWWWWWWWWWWWWWWWWWWW` (20 wide letters), `Samantha-Jane-Smith!`, and `<i>Lee</i>`. They test long names and markup.
 - **Run 1.** The live address, `https://pick-7.projectdarkinblade.workers.dev`, on 2026-10-15.
 - **Run 2.** A local `wrangler dev` of the fixed build. Run 2 repeated Run 1 after two defect fixes.
+- **Run 3.** The live address again, after the redeploy.
 - **Game.** One full 10-round game. It had a bust, three Flip 7 rounds, a 10-column Final table, and a network drop.
 - **Screenshots.** A screenshot of every screen in dark and light, in `%TEMP%\p7-e2e-out`. They are not in the repository.
 
@@ -18,6 +19,7 @@ Companion documents: `ACCEPTANCE_CRITERIA.md` (the criteria), `IMPLEMENTATION_PL
 | 1 (live, before fixes) | 55 of 56 | 1 (not a defect, see below) |
 | 1, with the new clipping check | 60 of 63 | 3 (2 clipping defects, 1 not a defect) |
 | 2 (local, after fixes) | 62 of 63 | 1 (not a defect, see below) |
+| 3 (live, after the redeploy) | 62 of 63 | 1 (not a defect, see below) |
 
 The one failure left in Run 2 is not a defect. The page logs a console error for each `426` reply. The app sends a plain GET to learn whether a room exists while the network is down. An existing room answers `426`.
 
@@ -64,4 +66,4 @@ Note on AC-C03. A browser test tool cannot cut an open WebSocket by switching th
 - **A physical phone.** Emulation does not test thumb reach, real touch accuracy, screen glare, or a real operating-system theme switch.
 - **A phone browser other than Chromium.** Safari on iPhone and Firefox were not tested. The page uses `100dvh`, `position: sticky` and the CSS `content` alternative-text form. Test these on an iPhone.
 - **A real network loss.** AC-C03 used a socket drop, as described above.
-- **The deployed fix.** Run 2 tested the fixes on a local build. The live address still runs the version from before the two fixes until the next deploy.
+- **Nothing else is open.** The two fixes are live (version `2afb8f37`). Run 3 repeated the script on the live address and passed 62 of 63 checks. The one failure is the `426` console message that is not a defect.

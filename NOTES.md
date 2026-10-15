@@ -15,3 +15,21 @@
 - The Final table scrolls inside its own box when a game has many rounds. The page never scrolls sideways.
 - The "Reconnecting…" banner shows from the moment the socket closes until the first view arrives again.
 - A removed player, an expired room, or a code that does not exist returns the player to Home with a message.
+
+## Code review of the web client (Phase 7)
+
+The review found 10 issues. Seven led to a fix with a test:
+
+- Two sockets after a tab switch.
+- A Submit lost while reconnecting.
+- A stale token that blocked a join.
+- A seat lost to a command sent before the resume finished.
+- A host locked out by blocked storage.
+- A message that disappeared early.
+- A frame that was not JSON.
+
+Three findings did not lead to a change:
+
+- `setHand(toggleNumber(hand, n))` reads the hand from the last render. Two taps cannot reach it before a render, because Preact renders between two click events.
+- After "Edit my hand" and Submit, the Waiting screen shows the old score for one round trip. The send gate prevents any loss, so the cost is only a short flash.
+- Old drafts stay in `localStorage`. Each one is a few hundred bytes. A reused room code within 24 hours is very unlikely.

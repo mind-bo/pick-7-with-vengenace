@@ -1,8 +1,9 @@
 import type { ErrorCode } from "../shared/protocol";
 
 /** Text for each error code that a phone can see. */
-export const MESSAGES: Record<ErrorCode | "ROOM_NOT_FOUND", string> = {
+export const MESSAGES: Record<ErrorCode | "ROOM_NOT_FOUND" | "OFFLINE", string> = {
   ROOM_NOT_FOUND: "Room not found. Check the code.",
+  OFFLINE: "Not connected yet. Wait for Reconnecting… to clear, then try again.",
   BAD_NAME: "Enter a name of 1 to 20 characters.",
   NAME_TAKEN: "That name is taken in this room. Pick another name.",
   ROOM_FULL: "This room is full (12 players).",

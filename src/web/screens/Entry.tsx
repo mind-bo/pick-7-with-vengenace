@@ -14,7 +14,7 @@ const MINUS = [2, 4, 6, 8, 10];
 
 interface Props {
   view: PlayingView;
-  send: (cmd: Command) => void;
+  send: (cmd: Command) => boolean;
   /** Called after Submit, so the app can show the Waiting screen. */
   onSubmitted: () => void;
 }
@@ -32,7 +32,8 @@ export function Entry({ view, send, onSubmitted }: Props) {
   const has13 = hand.numbers.includes(13);
 
   const submit = () => {
-    send({ t: "submit", round: view.round, entry: toRaw(hand) });
+    // The hand stays on screen, and the draft stays saved, when the phone cannot send now.
+    if (!send({ t: "submit", round: view.round, entry: toRaw(hand) })) return;
     clearDraft(view.code, view.round);
     onSubmitted();
   };

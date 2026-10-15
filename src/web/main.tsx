@@ -17,7 +17,6 @@ interface Session {
   joinName: string | null;
 }
 
-const NOTICE_MS = 4000;
 /** After these errors the Home screen keeps the room code and the name, so the player can fix them and try again. */
 const KEEP_CODE = new Set<string>(["BAD_NAME", "NAME_TAKEN", "ROOM_FULL", "GAME_STARTED"]);
 
@@ -73,12 +72,6 @@ function App() {
     setUrlRoom(keep ? session.code : null);
     setSession(null);
   }, [state?.fatal]);
-
-  useEffect(() => {
-    if (!state?.notice || !conn) return;
-    const timer = setTimeout(() => conn.clearNotice(), NOTICE_MS);
-    return () => clearTimeout(timer);
-  }, [state?.notice]);
 
   const view = state?.view ?? null;
   const round = view?.phase === "playing" ? view.round : 0;

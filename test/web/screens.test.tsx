@@ -52,6 +52,7 @@ const finished: Extract<View, { phase: "finished" }> = {
 };
 
 const noop = () => {};
+const sent = () => true;
 
 describe("names are plain text", () => {
   it("AC-N04: the lobby shows a markup name as literal text", () => {
@@ -77,7 +78,7 @@ describe("every screen carries the unofficial notice", () => {
   const screens: [string, () => preact.VNode][] = [
     ["Home", () => <Home initialName="" initialCode="" message={null} busy={false} onCreate={noop} onJoin={noop} />],
     ["Lobby", () => <Lobby view={lobby} send={noop} />],
-    ["Entry", () => <Entry view={playing} send={noop} onSubmitted={noop} />],
+    ["Entry", () => <Entry view={playing} send={sent} onSubmitted={noop} />],
     ["Waiting", () => <Waiting view={playing} send={noop} onEdit={noop} />],
     ["Final", () => <Final view={finished} />],
   ];
@@ -102,7 +103,7 @@ describe("Final", () => {
 
 describe("Entry", () => {
   it("AC-H10 and HE10: shows the help lines and the duplicate-number note", () => {
-    render(<Entry view={playing} send={noop} onSubmitted={noop} />, root);
+    render(<Entry view={playing} send={sent} onSubmitted={noop} />, root);
     const text = root.textContent ?? "";
     for (const part of ["The Zero:", "Unlucky 7:", "Lucky 13:", "Drew a number you already hold? That is a bust. Tap I busted."]) {
       expect(text).toContain(part);
@@ -110,7 +111,7 @@ describe("Entry", () => {
   });
 
   it("starts with the empty-hand label, and the Submit button shows the working's score", () => {
-    render(<Entry view={playing} send={noop} onSubmitted={noop} />, root);
+    render(<Entry view={playing} send={sent} onSubmitted={noop} />, root);
     expect(root.querySelector(".primary")?.textContent).toBe("Submit 0 (no cards)");
   });
 });

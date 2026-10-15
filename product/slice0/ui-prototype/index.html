@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PROTOTYPE - Slice 0 UI variants (throwaway)</title>
+<!--
+  PROTOTYPE. Throwaway. Question: "What should the Slice 0 screens look like?"
+  Three structurally different variants on one page: ?variant=A|B|C&screen=home|lobby|entry|waiting|final
+  The final tab is a design preview only. The real app shows the final screen only when phase = finished (PRD_SLICE0 EN1, AC-P06).
+  A = tile grid (dark)  B = hand tray + keypad (felt green)  C = score-first ledger rows (light)
+  Mock data only. No server. Scoring is score.proto.js (checked by check-score.cjs).
+  Open this file in a browser. Resize to 360-400px wide or use a phone view.
+-->
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b0b0d;color:#111;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+/* prototype chrome: deliberately unlike any variant */
+#top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;gap:6px;justify-content:center;padding:8px;background:#000;font:600 12px system-ui}
+#top button{padding:6px 10px;border-radius:999px;background:#2a2a2e;color:#ddd}
+#top button.on{background:#fff;color:#000}
+#top label{color:#aaa;display:flex;align-items:center;gap:4px;margin-left:8px}
+#bar{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:60;display:flex;gap:10px;align-items:center;background:#000;color:#fff;padding:6px 8px;border-radius:999px;box-shadow:0 4px 18px #0008;font:600 13px system-ui;border:1px solid #444}
+#bar button{width:34px;height:34px;border-radius:50%;background:#2a2a2e;color:#fff;font-size:18px}
+#stage{height:100%;padding:44px 0 62px;display:flex;justify-content:center}
+.phone{width:min(100vw,400px);height:100%;max-height:840px;overflow:auto;position:relative;border-radius:0;display:flex;flex-direction:column}
+@media(min-width:500px){.phone{border-radius:22px;outline:6px solid #222}}
+.notice{font-size:11px;opacity:.65;text-align:center;padding:10px 16px}
+.modal-bg{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;padding:24px;z-index:20}
+.modal{background:#fff;color:#111;border-radius:14px;padding:18px;width:100%}
+.modal p{margin:6px 0 14px}.modal .row{display:flex;gap:10px}.modal button{flex:1;min-height:44px;border-radius:10px;font-weight:700;background:#e5e5e5}
+.modal button.danger{background:#c0392b;color:#fff}
+.sr{position:absolute;left:-9999px}
+
+/* ===== Variant A: tile grid, dark ===== */
+.vA{background:#101318;color:#e8ecf1}
+.vA .hd{display:flex;justify-content:space-between;padding:14px 16px 4px;font-size:15px}
+.vA .sub{padding:0 16px 10px;font-size:13px;opacity:.75}
+.vA h3{font-size:13px;letter-spacing:.04em;text-transform:uppercase;opacity:.7;margin:12px 16px 8px;display:flex;justify-content:space-between}
+.vA .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px}
+.vA .tile{min-height:52px;border-radius:10px;background:#1c222b;border:2px solid #2a323e;font-size:20px;font-weight:700;position:relative}
+.vA .tile.on{background:#2563eb;border-color:#93b4ff;color:#fff}
+.vA .tile.on::after{content:"✓";position:absolute;top:2px;right:6px;font-size:12px}
+.vA .tile:disabled{opacity:.35}
+.vA .lucky{grid-column:span 2;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;border:2px dashed #3a4350;font-size:14px;min-height:52px}
+.vA .lucky.dim{opacity:.35}.vA .lucky.on{border-style:solid;border-color:#93b4ff;background:#1b2a4d}
+.vA .mods{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:0 16px}
+.vA .mods .tile{font-size:15px;min-height:48px}
+.vA .working{margin:14px 16px 4px;padding:12px;border-radius:10px;background:#0b0e12;border:1px solid #2a323e;font:600 15px ui-monospace,Consolas,monospace;line-height:1.5;word-break:break-word}
+.vA .note{margin:6px 16px;font-size:12px;opacity:.7}
+.vA details{margin:6px 16px;font-size:13px;opacity:.85}
+.vA .actions{display:flex;justify-content:space-between;padding:10px 16px}
+.vA .ghost{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #3a4350}
+.vA .ghost.warn{border-color:#c0562b;color:#ffb48f}
+.vA .submit{position:sticky;bottom:0;margin-top:auto;padding:22px 16px 12px;background:linear-gradient(#10131800,#101318 30%)}
+.vA .primary{width:100%;min-height:56px;border-radius:14px;background:#22c55e;color:#04210f;font-size:19px;font-weight:800}
+.vA .stack{display:flex;flex-direction:column;gap:12px;padding:16px}
+.vA .big{min-height:64px;border-radius:14px;background:#2563eb;font-size:18px;font-weight:800;color:#fff}
+.vA .big.alt{background:#1c222b;border:2px solid #2a323e}
+.vA input{width:100%;min-height:48px;border-radius:10px;border:2px solid #2a323e;background:#0b0e12;color:#fff;padding:0 12px;font-size:17px}
+.vA h1{font-size:26px;padding:22px 16px 0}.vA .lede{padding:6px 16px 0;opacity:.75;font-size:14px}
+.vA .list{margin:8px 16px;border-radius:12px;background:#1c222b;overflow:hidden}
+.vA .list li{list-style:none;display:flex;justify-content:space-between;padding:13px 14px;border-bottom:1px solid #2a323e;font-size:16px}
+.vA .tag{font-size:12px;padding:2px 8px;border-radius:999px;background:#2a323e}
+.vA .win{background:#14532d;margin:12px 16px;padding:16px;border-radius:14px;text-align:center}
+.vA .win b{font-size:24px;display:block}
+.vA table{width:calc(100% - 32px);margin:8px 16px;border-collapse:collapse;font-size:13px}
+.vA th,.vA td{padding:6px 4px;text-align:center;border-bottom:1px solid #2a323e}
+.vA .m{font-size:10px;display:block;opacity:.8}
+
+/* ===== Variant B: hand tray + thumb keypad, felt green ===== */
+.vB{background:#0f3b2c;color:#f4f1e6}
+.vB .tray{background:#0a2a1f;padding:12px 14px 10px;border-bottom:2px solid #1d5a43}
+.vB .trayhd{display:flex;justify-content:space-between;align-items:flex-start;font-size:12px;opacity:.8}
+.vB .cards{display:flex;flex-wrap:wrap;gap:6px;min-height:64px;margin:8px 0;align-items:center}
+.vB .pcard{width:44px;height:60px;border-radius:7px;background:#faf7ec;color:#222;font:800 20px Georgia,serif;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 2px 0 #0006}
+.vB .pcard i{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#c0392b;color:#fff;font:700 11px system-ui;display:flex;align-items:center;justify-content:center;font-style:normal}
+.vB .pcard.lk{outline:3px solid #f2c94c}
+.vB .empty{opacity:.6;font-size:14px}
+.vB .score{font:800 40px Georgia,serif;line-height:1;text-align:right}
+.vB .score small{display:block;font:600 11px system-ui;opacity:.7}
+.vB .working{font:600 14px ui-monospace,Consolas,monospace;line-height:1.45;word-break:break-word}
+.vB .chips{display:flex;gap:8px;overflow-x:auto;padding:10px 14px}
+.vB .chip{flex:1;min-width:0;min-height:44px;padding:0 4px;border-radius:999px;border:2px solid #2f7d5f;font-weight:700}
+.vB .chip.on{background:#f2c94c;color:#2a2200;border-color:#f2c94c}
+.vB .chip.on::before{content:"✓ "}
+.vB .pad{margin-top:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px}
+.vB .key{min-height:56px;border-radius:12px;background:#17543f;font:800 22px Georgia,serif;border:2px solid #2f7d5f;position:relative}
+.vB .key.on{background:#faf7ec;color:#1a1a1a;border-color:#fff}
+.vB .key.on::after{content:"✓";position:absolute;top:2px;right:7px;font:700 12px system-ui}
+.vB .key:disabled{opacity:.3}
+.vB .key.lk{font:700 14px system-ui}
+.vB .dock{display:flex;gap:8px;padding:6px 14px 12px}
+.vB .dock .sm{min-height:56px;padding:0 14px;border-radius:12px;border:2px solid #2f7d5f;font-size:13px;font-weight:700}
+.vB .dock .go{flex:1;min-height:56px;border-radius:12px;background:#f2c94c;color:#2a2200;font:800 19px system-ui}
+.vB .pg{padding:18px 16px}.vB h1{font:800 30px Georgia,serif}.vB p{opacity:.8;margin-top:6px;font-size:14px}
+.vB .codeboxes{display:flex;gap:8px;margin:16px 0}.vB .codeboxes span{flex:1;height:64px;border-radius:10px;background:#faf7ec;color:#222;font:800 30px Georgia,serif;display:flex;align-items:center;justify-content:center}
+.vB input{width:100%;min-height:48px;border-radius:10px;border:2px solid #2f7d5f;background:#0a2a1f;color:#fff;padding:0 12px;font-size:17px;margin-bottom:10px}
+.vB .gold{width:100%;min-height:56px;border-radius:12px;background:#f2c94c;color:#2a2200;font:800 18px system-ui;margin-top:8px}
+.vB .line{width:100%;min-height:48px;border-radius:12px;border:2px solid #2f7d5f;font-weight:700;margin-top:8px}
+.vB .seats{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+.vB .seat{width:calc(50% - 5px);padding:14px;border-radius:12px;background:#17543f;font-weight:700}.vB .seat small{display:block;opacity:.7;font-weight:500}
+.vB .pips{display:flex;gap:8px;margin:14px 0}.vB .pips span{flex:1;height:14px;border-radius:7px;background:#17543f}.vB .pips span.d{background:#f2c94c}
+.vB .winner{background:#faf7ec;color:#222;border-radius:14px;padding:18px;text-align:center;margin:14px 0}.vB .winner b{display:block;font:800 30px Georgia,serif}
+.vB .rank{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;background:#17543f;margin-bottom:6px}.vB .rank em{font:800 18px Georgia,serif;width:26px;font-style:normal}.vB .rank b{margin-left:auto}
+.vB table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}.vB th,.vB td{padding:6px 3px;text-align:center;border-bottom:1px solid #2f7d5f}.vB .m{display:block;font-size:10px;color:#f2c94c}
+
+/* ===== Variant C: score-first ledger rows, light ===== */
+.vC{background:#fbfaf6;color:#161616}
+.vC .hero{position:sticky;top:0;z-index:5;background:#161616;color:#fff;padding:12px 16px}
+.vC .hero .r{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;opacity:.8}
+.vC .hero .big{font:800 56px/1 system-ui;margin:2px 0}
+.vC .hero .working{font:600 13px ui-monospace,Consolas,monospace;line-height:1.4;word-break:break-word;color:#ffd966}
+.vC .tools{display:flex;gap:16px;padding:10px 16px;border-bottom:2px solid #161616;font-weight:700;font-size:14px}
+.vC .tools button{text-decoration:underline;min-height:44px}
+.vC .tools .bad{color:#b42318}
+.vC .sec{padding:12px 16px 4px;font:800 12px system-ui;letter-spacing:.08em;text-transform:uppercase}
+.vC .row{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0 16px;border-bottom:1px solid #d8d5c8;text-align:left}
+.vC .row .v{font:800 22px system-ui;width:38px}
+.vC .row .d{flex:1;font-size:12px;opacity:.65}
+.vC .row .sw{width:46px;height:28px;border-radius:14px;border:2px solid #161616;position:relative;background:#fff}
+.vC .row .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#161616}
+.vC .row.on{background:#fff3c4}.vC .row.on .sw{background:#161616}.vC .row.on .sw::after{left:20px;background:#ffd966}
+.vC .row.on .v::after{content:" ✓";font-size:14px}
+.vC .row:disabled{opacity:.35}
+.vC .foot{position:sticky;bottom:0;margin-top:auto;padding:10px 16px 12px;background:#fbfaf6;border-top:2px solid #161616}
+.vC .go{width:100%;min-height:56px;border-radius:6px;background:#161616;color:#ffd966;font:800 19px system-ui}
+.vC .pg{padding:18px 16px}.vC h1{font:800 28px system-ui}.vC p{margin-top:6px;font-size:14px;opacity:.75}
+.vC .tabs{display:flex;border:2px solid #161616;border-radius:8px;margin:16px 0;overflow:hidden}.vC .tabs button{flex:1;min-height:44px;font-weight:700}.vC .tabs .on{background:#161616;color:#fff}
+.vC input{width:100%;min-height:48px;border-radius:6px;border:2px solid #161616;background:#fff;padding:0 12px;font-size:17px;margin-bottom:10px}
+.vC .blk{width:100%;min-height:56px;border-radius:6px;background:#161616;color:#ffd966;font:800 18px system-ui}
+.vC table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}.vC th,.vC td{padding:8px 4px;text-align:left;border-bottom:1px solid #d8d5c8}.vC td.n,.vC th.n{text-align:right}
+.vC tr.w td{background:#fff3c4;font-weight:800}.vC .m{font-size:10px;margin-left:3px;background:#161616;color:#ffd966;padding:1px 4px;border-radius:3px}
+.vC .card{border:2px solid #161616;border-radius:8px;padding:12px;margin:12px 0}.vC .card b{font-size:26px}
+</style>
+</head>
+<body>
+<div id="top"></div>
+<main id="stage"><div class="phone" id="phone"></div></main>
+<div id="bar"><button data-a="vprev" aria-label="Previous variant">‹</button><span id="vlabel"></span><button data-a="vnext" aria-label="Next variant">›</button></div>
+
+<script src="score.proto.js"></script>
+<script>
+const VARIANTS = { A: "Tile grid", B: "Hand tray + keypad", C: "Score-first ledger" };
+const SCREENS = ["home", "lobby", "entry", "waiting", "final"];
+const qs = new URLSearchParams(location.search);
+const S = {
+  variant: VARIANTS[qs.get("variant")] ? qs.get("variant") : "A",
+  screen: SCREENS.includes(qs.get("screen")) ? qs.get("screen") : "entry",
+  sel: new Set([13, 12, 10]), lucky: false, second: false, minus: new Set([4]), halve: true, bust: false,
+  modal: null, tie: true,
+};
+const NUMS = [0,1,2,3,4,5,6,7,8,9,10,11,12,13];
+const MINUS = [2,4,6,8,10];
+const MINUSX = (n) => "−" + n;
+const cards = () => S.sel.size + (S.second ? 1 : 0);
+const entry = () => ({ bust: S.bust, numbers: [...S.sel], lucky13: S.lucky, second13: S.second, minus: [...S.minus], halve: S.halve });
+const result = () => P7.scoreEntry(entry());
+const working = () => P7.formatWorking(result());
+const label = () => { const r = result(); return S.bust ? "Submit 0" : (S.sel.size === 0 && !S.second ? "Submit 0 (no cards)" : "Submit " + r.value); };
+const notice = '<p class="notice">Unofficial fan tool. Not made by The Op Games.</p>';
+const helpLines = '<p><b>The Zero:</b> a hand with a 0 scores 0, unless it is a Flip 7.<br><b>Unlucky 7:</b> scores as a normal 7. Tap 7.<br><b>Lucky 13:</b> you may hold two 13s. Turn on the switch.</p>';
+const dupNote = '<p class="note">Drew a number you already hold? That is a bust. Tap I busted.</p>';
+
+/* mock game for Final screen: 5 rounds, scores only */
+function game() {
+  const P = [
+    { n: "Ana", you: true, r: [35, 0, 52, 61, 67], f: [0] },
+    { n: "Sam", r: [40, 55, 0, 50, S.tie ? 70 : 62], f: [] },
+    { n: "Priya", r: [28, 33, 47, 0, 82], f: [] },
+    { n: "Jo", r: [22, 41, 38, 25, 35], f: [1] },
+    { n: "Lee", r: [30, 0, 44, 36, 32], f: [] },
+  ];
+  P.forEach((p) => (p.t = p.r.reduce((a, b) => a + b, 0)));
+  const max = Math.max(...P.map((p) => p.t));
+  const sorted = [...P].sort((a, b) => b.t - a.t);
+  sorted.forEach((p) => (p.rank = 1 + sorted.filter((q) => q.t > p.t).length));
+  return { P, sorted, winners: sorted.filter((p) => p.t === max) };
+}
+const mark = (p, i) => (p.r[i] === 0 && !p.f.includes(i) ? '<span class="m">bust</span>' : p.f.includes(i) ? '<span class="m">Flip 7</span>' : "");
+const roundsTable = (g) => '<table><tr><th></th>' + [1,2,3,4,5].map((i) => "<th>R" + i + "</th>").join("") + "<th>Total</th></tr>" +
+  g.P.map((p) => "<tr><td>" + esc(p.n) + "</td>" + p.r.map((v, i) => "<td>" + v + mark(p, i) + "</td>").join("") + "<td><b>" + p.t + "</b></td></tr>").join("") + "</table>";
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const roster = [
+  { n: "Ana (you)", s: "submitted" }, { n: "Sam", s: "submitted" }, { n: "Priya", s: "entering" },
+  { n: "Jo", s: "offline" }, { n: "Lee", s: "submitted" },
+];
+const ICON = { submitted: "✓ Submitted", entering: "✎ Entering", offline: "○ Offline" };
+const subCount = () => roster.filter((r) => r.s === "submitted").length;
+
+/* ---------- Variant A ---------- */
+const A = {
+  home: () => `<h1>Flip 7 Scorekeeper</h1><p class="lede">Private totals. Nobody sees your score until the game ends.</p>
+    <div class="stack"><button class="big" data-a="go:lobby">Create game</button>
+    <div class="list" style="margin:0;padding:12px"><input placeholder="Room code" value="K7QF" aria-label="Room code"><div style="height:8px"></div><input placeholder="Your name" value="Sam" aria-label="Your name"><div style="height:8px"></div><button class="big alt" style="width:100%" data-a="go:lobby">Join game</button></div></div>${notice}`,
+  lobby: () => `<h1>Room K7QF</h1><p class="lede">Share the code or the link. 5 players joined.</p>
+    <ul class="list">${["Ana","Sam","Priya","Jo","Lee"].map((n,i)=>`<li><span>${n}${i===0?' <span class="tag">host</span>':""}</span><span class="tag">${i===3?"○ Offline":"● Online"}</span></li>`).join("")}</ul>
+    <div class="actions"><button class="ghost">Copy link</button><button class="ghost warn">Remove…</button></div>
+    <div class="submit"><button class="primary" data-a="go:entry">Start game (5 players)</button></div>${notice}`,
+  entry() {
+    const full = cards() >= 7;
+    const tiles = NUMS.map((n) => `<button class="tile ${S.sel.has(n) ? "on" : ""}" data-a="t:${n}" ${full && !S.sel.has(n) ? "disabled" : ""} aria-pressed="${S.sel.has(n)}">${n}</button>`).join("");
+    const lucky = !S.sel.has(13) ? `<div class="lucky dim">Lucky 13</div>` : !S.lucky ? `<button class="lucky" data-a="lucky" aria-pressed="false">Lucky 13: off</button>` :
+      `<button class="lucky on" style="grid-column:span 1" data-a="lucky" aria-pressed="true">Lucky 13 ✓</button><button class="tile ${S.second ? "on" : ""}" data-a="second" ${full && !S.second ? "disabled" : ""} aria-pressed="${S.second}">+13</button>`;
+    return `<div class="hd"><b>Round 4</b><span>Room K7QF</span></div><div class="sub">Your total so far: <b>87</b> · private</div>
+    <h3>Number cards <span>${cards()} of 7${cards() === 7 ? " · Flip 7" : ""}</span></h3><div class="grid">${tiles}${lucky}</div>
+    <h3>Modifiers</h3><div class="mods">${MINUS.map((m) => `<button class="tile ${S.minus.has(m) ? "on" : ""}" data-a="m:${m}" aria-pressed="${S.minus.has(m)}">${MINUSX(m)}</button>`).join("")}<button class="tile ${S.halve ? "on" : ""}" data-a="h" aria-pressed="${S.halve}">÷2</button></div>
+    <div class="working" aria-live="polite">${working()}</div>${dupNote}<details><summary>What do the special cards do?</summary>${helpLines}</details>
+    <div class="actions"><button class="ghost" data-a="clear">Clear all</button><button class="ghost warn" data-a="bustq">I busted</button></div>
+    <div class="submit"><button class="primary" data-a="submit">${label()}</button></div>${notice}`;
+  },
+  waiting: () => `<h1>Submitted</h1><p class="lede">This round: <b>${result().value}</b> · Your total so far: <b>87</b> (updates at lock)</p>
+    <h3>${subCount()} of ${roster.length} submitted</h3><ul class="list">${roster.map((r) => `<li><span>${r.n}</span><span class="tag">${ICON[r.s]}</span></li>`).join("")}</ul>
+    <div class="actions"><button class="ghost" data-a="edit">Edit my hand</button><span></span></div>${notice}`,
+  final() {
+    const g = game();
+    return `<div class="win"><span>${g.winners.length > 1 ? "Co-winners" : "Winner"}</span><b>${g.winners.map((w) => esc(w.n)).join(" & ")}</b>${g.winners[0].t} points</div>
+    <ul class="list">${g.sorted.map((p) => `<li><span>${p.rank}. ${esc(p.n)}</span><b>${p.t}</b></li>`).join("")}</ul>
+    <h3>Round by round</h3>${roundsTable(g)}${notice}`;
+  },
+};
+
+/* ---------- Variant B ---------- */
+const B = {
+  home: () => `<div class="pg"><h1>Flip 7<br>Scorekeeper</h1><p>Enter the code your host reads out.</p>
+    <div class="codeboxes"><span>K</span><span>7</span><span>Q</span><span>F</span></div><input placeholder="Your name" value="Sam" aria-label="Your name">
+    <button class="gold" data-a="go:lobby">Join game</button><button class="line" data-a="go:lobby">Create a new game</button></div>${notice}`,
+  lobby: () => `<div class="pg"><p>Room</p><h1>K7QF</h1><p>Players at the table</p>
+    <div class="seats">${["Ana","Sam","Priya","Jo","Lee"].map((n,i)=>`<div class="seat">${n}<small>${i===0?"host":i===3?"○ offline":"● online"}</small></div>`).join("")}</div>
+    <button class="line">Copy join link</button><button class="gold" data-a="go:entry">Start game</button></div>${notice}`,
+  entry() {
+    const full = cards() >= 7;
+    const held = [...S.sel].sort((a, b) => b - a).map((n) => `<button class="pcard" data-a="t:${n}" aria-label="Remove ${n}">${n}<i>×</i></button>`);
+    if (S.second) held.push(`<button class="pcard lk" data-a="second" aria-label="Remove second 13">13<i>×</i></button>`);
+    const key = (n) => `<button class="key ${S.sel.has(n) ? "on" : ""}" data-a="t:${n}" ${full && !S.sel.has(n) ? "disabled" : ""} aria-pressed="${S.sel.has(n)}">${n}</button>`;
+    const lk = `<button class="key lk ${S.lucky ? "on" : ""}" data-a="lucky" ${S.sel.has(13) ? "" : "disabled"} aria-pressed="${S.lucky}">${S.lucky ? "Lucky 13 on" : "Lucky 13"}</button>`;
+    const r = result();
+    return `<div class="tray"><div class="trayhd"><span>Round 4 · Room K7QF · Total so far 87</span><span>${cards()} of 7</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><div class="cards" style="flex:1">${held.join("") || '<span class="empty">Tap numbers below</span>'}</div><div class="score">${S.bust ? 0 : r.value}<small>${r.kind === "flip7" ? "Flip 7" : "this round"}</small></div></div>
+      <div class="working" aria-live="polite">${working()}</div></div>
+      <div class="chips">${MINUS.map((m) => `<button class="chip ${S.minus.has(m) ? "on" : ""}" data-a="m:${m}" aria-pressed="${S.minus.has(m)}">${MINUSX(m)}</button>`).join("")}<button class="chip ${S.halve ? "on" : ""}" data-a="h" aria-pressed="${S.halve}">÷2</button></div>
+      <div style="padding:0 14px;font-size:12px;opacity:.75">Drew a number you already hold? That is a bust.</div>
+      <div class="pad">${[1,2,3,4,5,6,7,8,9,10,11,12].map(key).join("")}${key(0)}${key(13)}${lk}</div>
+      <div class="dock"><button class="sm" data-a="clear">Clear</button><button class="sm" data-a="bustq">I busted</button><button class="go" data-a="submit">${label()}</button></div>${notice}`;
+  },
+  waiting: () => `<div class="pg"><h1>Hand in</h1><p>This round: <b>${result().value}</b> · total so far 87 (updates at lock)</p>
+    <div class="pips">${roster.map((r) => `<span class="${r.s === "submitted" ? "d" : ""}"></span>`).join("")}</div><p><b>${subCount()} of ${roster.length}</b> submitted</p>
+    <div class="seats">${roster.map((r) => `<div class="seat">${r.n}<small>${ICON[r.s]}</small></div>`).join("")}</div>
+    <button class="line" data-a="edit">Edit my hand</button></div>${notice}`,
+  final() {
+    const g = game();
+    return `<div class="pg"><div class="winner"><span>${g.winners.length > 1 ? "Co-winners" : "Winner"}</span><b>${g.winners.map((w) => esc(w.n)).join(" & ")}</b>${g.winners[0].t} points</div>
+    ${g.sorted.map((p) => `<div class="rank"><em>${p.rank}</em>${esc(p.n)}<b>${p.t}</b></div>`).join("")}<p style="margin-top:14px">Round by round</p>${roundsTable(g)}</div>${notice}`;
+  },
+};
+
+/* ---------- Variant C ---------- */
+const C = {
+  home: () => `<div class="pg"><h1>Flip 7 Scorekeeper</h1><p>Totals stay private until someone reaches 200.</p>
+    <div class="tabs"><button class="on">Join</button><button data-a="go:lobby">Create</button></div>
+    <input placeholder="Room code" value="K7QF" aria-label="Room code"><input placeholder="Your name" value="Sam" aria-label="Your name"><button class="blk" data-a="go:lobby">Join game</button></div>${notice}`,
+  lobby: () => `<div class="pg"><h1>Room K7QF</h1><p>Host: Ana · 5 joined</p>
+    <table><tr><th>Player</th><th>Status</th></tr>${["Ana","Sam","Priya","Jo","Lee"].map((n,i)=>`<tr><td>${n}${i===0?" (host)":""}</td><td>${i===3?"○ Offline":"● Online"}</td></tr>`).join("")}</table>
+    <button class="blk" data-a="go:entry">Start game</button><p style="text-align:center;margin-top:10px">Join link: p7.example/?room=K7QF</p></div>${notice}`,
+  entry() {
+    const full = cards() >= 7;
+    const r = result();
+    const row = (n) => `<button class="row ${S.sel.has(n) ? "on" : ""}" data-a="t:${n}" ${full && !S.sel.has(n) ? "disabled" : ""} aria-pressed="${S.sel.has(n)}"><span class="v">${n}</span><span class="d">${n === 0 ? "The Zero: scores 0 unless Flip 7" : n === 7 ? "Includes Unlucky 7 (scores as 7)" : n === 13 ? "Includes Lucky 13" : n + " in the deck"}</span><span class="sw"></span></button>`;
+    const lucky = S.sel.has(13) ? `<button class="row ${S.lucky ? "on" : ""}" data-a="lucky" aria-pressed="${S.lucky}"><span class="v" style="font-size:14px;width:38px">L13</span><span class="d">Lucky 13: allow a second 13</span><span class="sw"></span></button>` : "";
+    const second = S.lucky ? `<button class="row ${S.second ? "on" : ""}" data-a="second" ${full && !S.second ? "disabled" : ""} aria-pressed="${S.second}"><span class="v">13</span><span class="d">Second 13 (counts as a card)</span><span class="sw"></span></button>` : "";
+    return `<div class="hero"><div class="r"><span>Round 4 · Room K7QF</span><span>Total so far 87 · ${cards()} of 7</span></div><div class="big">${S.bust ? 0 : r.value}</div><div class="working" aria-live="polite">${working()}</div></div>
+      <div class="tools"><button data-a="clear">Clear all</button><button class="bad" data-a="bustq">I busted</button></div>
+      <div class="sec">Number cards</div>${NUMS.map(row).join("")}${lucky}${second}
+      <div class="sec">Modifiers</div>${MINUS.map((m) => `<button class="row ${S.minus.has(m) ? "on" : ""}" data-a="m:${m}" aria-pressed="${S.minus.has(m)}"><span class="v" style="font-size:18px">${MINUSX(m)}</span><span class="d">Minus ${m}</span><span class="sw"></span></button>`).join("")}
+      <button class="row ${S.halve ? "on" : ""}" data-a="h" aria-pressed="${S.halve}"><span class="v" style="font-size:18px">÷2</span><span class="d">Halve, round down</span><span class="sw"></span></button>
+      <p class="note" style="padding:10px 16px;font-size:12px;opacity:.7">Drew a number you already hold? That is a bust. Tap I busted.</p>
+      <div class="foot"><button class="go" data-a="submit">${label()}</button></div>${notice}`;
+  },
+  waiting: () => `<div class="pg"><h1>Submitted</h1><div class="card">This round<br><b>${result().value}</b><br><span style="font-size:13px;opacity:.7">Total so far 87 (updates at lock)</span></div>
+    <p><b>${subCount()} of ${roster.length}</b> submitted</p><table><tr><th>Player</th><th>Status</th></tr>${roster.map((r) => `<tr><td>${r.n}</td><td>${ICON[r.s]}</td></tr>`).join("")}</table>
+    <button class="blk" style="background:#fff;color:#161616;border:2px solid #161616" data-a="edit">Edit my hand</button></div>${notice}`,
+  final() {
+    const g = game();
+    return `<div class="pg"><h1>${g.winners.length > 1 ? "Co-winners: " : "Winner: "}${g.winners.map((w) => esc(w.n)).join(" & ")}</h1><p>${g.winners[0].t} points</p>
+    <table><tr><th>#</th><th>Player</th>${[1,2,3,4,5].map((i) => `<th class="n">R${i}</th>`).join("")}<th class="n">Total</th></tr>
+    ${g.sorted.map((p) => `<tr class="${g.winners.includes(p) ? "w" : ""}"><td>${p.rank}</td><td>${esc(p.n)}</td>${p.r.map((v, i) => `<td class="n">${v}${p.r[i] === 0 && !p.f.includes(i) ? '<span class="m">B</span>' : p.f.includes(i) ? '<span class="m">F7</span>' : ""}</td>`).join("")}<td class="n">${p.t}</td></tr>`).join("")}</table>
+    <p style="font-size:12px">B = bust · F7 = Flip 7</p></div>${notice}`;
+  },
+};
+const V = { A, B, C };
+
+/* ---------- shell ---------- */
+function render() {
+  const ph = document.getElementById("phone");
+  const keepScroll = ph.scrollTop;
+  ph.className = "phone v" + S.variant;
+  ph.innerHTML = V[S.variant][S.screen]() + (S.modal ? modalHtml() : "");
+  ph.scrollTop = keepScroll;
+  document.getElementById("vlabel").textContent = S.variant + " (" + VARIANTS[S.variant] + ")";
+  document.getElementById("top").innerHTML = SCREENS.map((s) => `<button class="${s === S.screen ? "on" : ""}" data-a="go:${s}">${s === "final" ? "final (end only)" : s}</button>`).join("") +
+    `<label><input type="checkbox" data-a="tie" ${S.tie ? "checked" : ""}> tie at top</label>`;
+  const u = new URL(location.href); u.searchParams.set("variant", S.variant); u.searchParams.set("screen", S.screen); history.replaceState(null, "", u);
+}
+function modalHtml() {
+  const bust = S.modal === "bust";
+  return `<div class="modal-bg"><div class="modal" role="dialog" aria-modal="true"><b>${bust ? "Mark this round as a bust?" : "Clear the whole hand?"}</b><p>${bust ? "Your score for this round will be 0." : "All selected cards and modifiers will be removed."}</p><div class="row"><button data-a="cancel">Cancel</button><button class="danger" data-a="confirm">${bust ? "Yes, I busted" : "Clear all"}</button></div></div></div>`;
+}
+function tog(set, v) { set.has(v) ? set.delete(v) : set.add(v); }
+document.addEventListener("click", (ev) => {
+  const el = ev.target.closest("[data-a]"); if (!el) return;
+  const [a, arg] = el.dataset.a.split(":");
+  if (a === "go") S.screen = arg;
+  else if (a === "vprev" || a === "vnext") { const k = Object.keys(VARIANTS); S.variant = k[(k.indexOf(S.variant) + (a === "vnext" ? 1 : k.length - 1)) % k.length]; }
+  else if (a === "t") {
+    const n = +arg; S.bust = false;
+    if (S.sel.has(n)) { S.sel.delete(n); if (n === 13) { S.lucky = false; S.second = false; } }
+    else if (cards() < 7) S.sel.add(n);
+  }
+  else if (a === "lucky") { S.bust = false; S.lucky = !S.lucky; if (!S.lucky) S.second = false; }
+  else if (a === "second") { S.second = !S.second; if (S.second && !S.lucky) S.lucky = true; }
+  else if (a === "m") { S.bust = false; tog(S.minus, +arg); }
+  else if (a === "h") { S.bust = false; S.halve = !S.halve; }
+  else if (a === "bustq") S.modal = "bust";
+  else if (a === "clear") S.modal = "clear";
+  else if (a === "cancel") S.modal = null;
+  else if (a === "confirm") {
+    if (S.modal === "bust") { S.bust = true; } else { S.sel.clear(); S.minus.clear(); S.halve = false; S.lucky = false; S.second = false; S.bust = false; }
+    S.modal = null;
+  }
+  else if (a === "submit") S.screen = "waiting";
+  else if (a === "edit") S.screen = "entry";
+  else if (a === "tie") { S.tie = el.checked; }
+  render();
+});
+document.addEventListener("keydown", (e) => {
+  if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === "ArrowLeft") document.querySelector('[data-a="vprev"]').click();
+  if (e.key === "ArrowRight") document.querySelector('[data-a="vnext"]').click();
+});
+render();
+</script>
+</body>
+</html>

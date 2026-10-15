@@ -76,6 +76,8 @@ test/
 wrangler.jsonc
 ```
 
+`PlayerId` lives in `shared/outcome.ts`. Reason: `outcome` and `protocol.ts` use it, and `shared/` must not import `worker/`. `room.ts` re-exports it.
+
 Dependency direction: `web` and `worker` import `shared`. `web` never imports `worker`. `worker/room.ts` imports only `shared`. Only `room-do.ts` touches Cloudflare APIs.
 
 ## 4. Shape
@@ -139,6 +141,7 @@ export function formatWorking(score: RoundScore): string {
 
 ```ts
 // shared/outcome.ts
+export type PlayerId = string;                // server-generated, opaque. Moved here from worker/room.ts
 export interface Outcome { finished: boolean; winners: readonly PlayerId[]; ranks: Readonly<Record<PlayerId, number>> }
 /** finished ⇔ max total ≥ TARGET. winners = every player whose total equals the max. Ranks use 1,1,3 style. */
 export function outcome(totals: Readonly<Record<PlayerId, number>>): Outcome { throw new Error("not implemented"); }
@@ -146,7 +149,7 @@ export function outcome(totals: Readonly<Record<PlayerId, number>>): Outcome { t
 
 ```ts
 // worker/room.ts  (pure)
-export type PlayerId = string;                // server-generated, opaque
+export type { PlayerId } from "../shared/outcome";   // re-export. The type lives in shared/
 export interface Player { id: PlayerId; name: string }
 export interface LockedRound { number: number; scores: Record<PlayerId, RoundScore> }  // scores only, no entries
 

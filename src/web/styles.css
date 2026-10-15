@@ -337,6 +337,13 @@ input {
   font-size: 16px;
   min-height: 52px;
 }
+.list li > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.list li > b {
+  flex-shrink: 0;
+}
 .who {
   display: flex;
   align-items: center;
@@ -372,6 +379,9 @@ input {
 .linkrow input {
   min-width: 0;
   font-size: 14px;
+}
+.linkrow .ghost {
+  white-space: nowrap;
 }
 
 /* final */

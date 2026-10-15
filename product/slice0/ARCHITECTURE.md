@@ -189,6 +189,13 @@ export function project(room: Room, viewer: PlayerId, online: ReadonlySet<Player
 }
 ```
 
+Changes made in Phase 4. The reason for each change is in the list:
+
+- `Command` and `ErrorCode` live in `shared/protocol.ts`, not in `room.ts`. Reason: the web client sends commands, and `web/` must not import `worker/`. `room.ts` imports both types.
+- `room.ts` also exports `createRoom(code, hostName, now, newId)`, `generateCode(random?)`, `CODE_ALPHABET`, `CODE_LENGTH`, `MIN_PLAYERS` and `MAX_PLAYERS`. Reason: `Room` needs a host id before the first `reduce` call, and the code generator belongs with the room rules. These are additions. No signature in the sketch changed.
+- `reduce` refuses `remove` of the host with `BAD_STATE`, because `ErrorCode` has no more specific code. A `join` with an actor id also gets `BAD_STATE`.
+- `project` shows a player as `offline` when the player has no open socket, even if the player submitted. The `submittedCount` still counts that player.
+
 ```ts
 // shared/protocol.ts  (wire contract)
 export type ServerMsg =

@@ -1,6 +1,6 @@
 # Pick 7 scorekeeper
 
-Pick 7 is a free web page that keeps score for the card game *Flip 7: With a Vengeance*. It keeps every player's total private.
+Pick 7 scorekeeper is a free web page that keeps score for the card game *Flip 7: With a Vengeance*. It keeps every player's total private.
 
 **Run it now: https://pick-7.projectdarkinblade.workers.dev**
 

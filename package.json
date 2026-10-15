@@ -1,0 +1,22 @@
+{
+  "name": "pick-7",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite build && wrangler dev",
+    "build": "tsc -p tsconfig.web.json && tsc -p tsconfig.worker.json && tsc -p tsconfig.test.json && vite build",
+    "test": "vitest run",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.4.3",
+    "@cloudflare/workers-types": "^5.20261015.1",
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^22.0.0",
+    "preact": "^11.0.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^4.1.12",
+    "wrangler": "^4.151.0"
+  }
+}

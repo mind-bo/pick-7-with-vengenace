@@ -325,7 +325,7 @@ Build order matches test order: `score.ts` first, then `outcome.ts`, then `room.
 ## 9. Open questions and risks
 
 1. **Free-plan numbers.** Resolved on 2026-10-15. The pasted Cloudflare free-plan text gives 13,000 GB-s per day, not 313,000. Question: does a normal game stay inside that number? Answer: yes. Rule used (from Cloudflare's billing description, as I understand it): duration bills at 128 MB, so one room active for one hour costs about 450 GB-s. The daily allowance covers about 28 room-hours. Hibernation lowers the cost. Run AC-N07 before launch to confirm the page has not changed.
-2. **Wrangler on Windows.** Does the local dev server (`wrangler dev`) handle Durable Object WebSockets on this machine? Answer at scaffold time, in the first hour.
+2. **Wrangler on Windows.** Does the local dev server (`wrangler dev`) handle Durable Object WebSockets on this machine? Answer: yes. Result on 2026-10-15, Wrangler 4.151.0, Windows 11. A test Durable Object accepted two WebSockets with the Hibernation API, replied to each message, and showed one open socket after the other socket closed. Static assets from `dist` also loaded.
 3. **Hibernation and `online`.** Does `getWebSockets()` list a socket during `webSocketClose`? If it does, the Offline broadcast needs to exclude the closing socket. Verify in the first integration test.
 4. **Playtest bars.** Are the proposed bars in `PRD_SLICE0.md` Section 8 the ones you want? Change them before the playtest.
 5. **Product name.** The folder says "pick-7-with-vengenance". Any public name must avoid implying official status (NF4).
